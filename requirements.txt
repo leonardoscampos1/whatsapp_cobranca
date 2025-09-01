@@ -1,5 +1,9 @@
-pandas
-openpyxl
-requests
 streamlit
-
+pandas
+requests
+openpyxl
+pyautogui
+selenium
+winotify
+sqlalchemy
+oracledb
