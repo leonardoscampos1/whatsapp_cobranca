@@ -5,7 +5,7 @@ import streamlit as st
 import openpyxl as xl
 
 # --- Configurações ---
-url = "http://127.0.0.1:8080/message/sendText/enviomensagem"
+url = "https://whatsappcobranca-production.up.railway.app//message/sendText/enviomensagem"
 api_key = "123456"
 numero_remetente = "5521980210457"  # sua instância
 
@@ -77,3 +77,4 @@ if arquivo:
                 st.error(f"❌ {cliente} {numero_dest}: Connection Error: {errc}")
             except requests.exceptions.Timeout as errt:
                 st.error(f"❌ {cliente} {numero_dest}: Timeout Error: {errt}")
+
