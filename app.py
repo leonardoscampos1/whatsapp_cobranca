@@ -13,7 +13,8 @@ st.title("📲 Envio de Mensagens de Cobrança")
 arquivo = st.file_uploader("Selecione o arquivo Excel", type=["xlsx"])
 
 if arquivo:
-    df = pd.read_excel(arquivo, engine="openpyxl", dtype=str)
+    #não trazer o ind
+    df = pd.read_excel(arquivo, engine="openpyxl", dtype=str, index_col=None)
 
     st.write("Pré-visualização dos dados:")
     st.dataframe(df.head())
