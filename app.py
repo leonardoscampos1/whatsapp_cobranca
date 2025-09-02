@@ -3,9 +3,8 @@ import requests
 import re
 import streamlit as st
 import openpyxl as xl
-
 # --- Configurações ---
-url = "https://whatsappcobranca-production.up.railway.app/message/sendText/enviomensagem"
+url = "http://127.0.0.1:8080/message/sendText/enviomensagem"
 api_key = "123456"
 numero_remetente = "5521980210457"  # sua instância
 
@@ -14,7 +13,7 @@ st.title("📲 Envio de Mensagens de Cobrança")
 arquivo = st.file_uploader("Selecione o arquivo Excel", type=["xlsx"])
 
 if arquivo:
-    # Não trazer o índice
+    #não trazer o ind
     df = pd.read_excel(arquivo, engine="openpyxl", dtype=str, index_col=None)
 
     st.write("Pré-visualização dos dados:")
@@ -23,19 +22,10 @@ if arquivo:
     if st.button("Enviar Mensagens"):
         for _, row in df.iterrows():
             cliente = row.get('CLIENTE', 'Cliente')
-            try:
-                emissao = pd.to_datetime(row.get('EMISSÃO')).strftime('%d/%m/%Y')
-            except:
-                emissao = "N/A"
+            emissao = pd.to_datetime(row.get('EMISSÃO')).strftime('%d/%m/%Y')
             nf = row.get('NF', '')
-            try:
-                valor = f"R$ {float(row.get('VALOR', 0)):.2f}".replace('.', ',')
-            except:
-                valor = "R$ 0,00"
-            try:
-                vencimento = pd.to_datetime(row.get('VENCIMENTO')).strftime('%d/%m/%Y')
-            except:
-                vencimento = "N/A"
+            valor = f"R$ {float(row.get('VALOR', 0)):.2f}".replace('.', ',')
+            vencimento = pd.to_datetime(row.get('VENCIMENTO')).strftime('%d/%m/%Y')
             vendedor = row.get('VENDEDOR', '')
             obs = row.get('OBS', '')
             filial = row.get('FILIAL', '')
@@ -54,7 +44,7 @@ if arquivo:
             )
 
             payload = {
-                "number": numero_dest,
+                "number": numero_dest,  # <--- Corrigido: envia para o número do cliente
                 "textMessage": {"text": mensagem}
             }
 
@@ -64,18 +54,18 @@ if arquivo:
             }
 
             try:
-                response = requests.post(url, json=payload, headers=headers, timeout=10)
-                response.raise_for_status()
-                try:
-                    data = response.json()
-                    st.success(f"✅ {cliente} {numero_dest}: Mensagem enviada com sucesso")
-                except ValueError:
-                    st.warning(f"⚠️ {cliente} {numero_dest}: Resposta não é JSON. Retorno: {response.text}")
-            except requests.exceptions.HTTPError as errh:
-                st.error(f"❌ {cliente} {numero_dest}: HTTP Error: {errh}")
-            except requests.exceptions.ConnectionError as errc:
-                st.error(f"❌ {cliente} {numero_dest}: Connection Error: {errc}")
-            except requests.exceptions.Timeout as errt:
-                st.error(f"❌ {cliente} {numero_dest}: Timeout Error: {errt}")
+                response = requests.post(url, json=payload, headers=headers)
+                result = response.json()
 
+                status = result.get("status", "").upper()
+
+                if status == "PENDING":
+                    st.success(f"✅ {cliente}: Mensagem enviada! (Status: pendente, confira no app)")
+                elif status == "SENT":
+                    st.success(f"✅ {cliente}: Mensagem enviada com sucesso!")
+                else:
+                    st.warning(f"⚠️ {cliente}: Retorno inesperado - {response.text}")
+
+            except Exception as e:
+                st.error(f"❌ {cliente}: Erro ao enviar - {e}")
 
