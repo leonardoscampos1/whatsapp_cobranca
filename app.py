@@ -4,7 +4,8 @@ import re
 import streamlit as st
 import openpyxl as xl
 # --- Configurações ---
-url = "https://whatsappcobranca.streamlit.app///message/sendText/enviomensagem"
+url = "https://whatsappcobranca-production.up.railway.app/message/sendText/enviomensagem"
+
 api_key = "123456"
 numero_remetente = "5521980210457"  # sua instância
 
@@ -68,6 +69,7 @@ if arquivo:
 
             except Exception as e:
                 st.error(f"❌ {cliente}: Erro ao enviar - {e}")
+
 
 
 
