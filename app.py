@@ -56,7 +56,12 @@ if arquivo:
 
             try:
                 response = requests.post(url, json=payload, headers=headers)
-                result = response.json()
+                try:
+                    result = response.json()
+                except ValueError:
+                    st.error(f"⚠️ {cliente}: Resposta não é JSON. Retorno bruto: {response.text}")
+                    continue
+
 
                 status = result.get("status", "").upper()
 
@@ -69,6 +74,7 @@ if arquivo:
 
             except Exception as e:
                 st.error(f"❌ {cliente}: Erro ao enviar - {e}")
+
 
 
 
